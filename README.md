@@ -1,7 +1,6 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>ThaiMusicGame</title>
     <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
     <style>
         body { 
@@ -12,6 +11,7 @@
             background-attachment: fixed;
             color:#444;
             padding-bottom: 100px;
+            overflow-x: hidden; /* ป้องกันการเลื่อนแนวนอน */
         }
         h1 { 
             margin: 20px;
@@ -31,17 +31,22 @@
 
         /* หน้าแรก */
         #intro { 
-            display:flex; flex-direction:column; align-items:center; justify-content:center;
-            height:100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden; /* ป้องกันการล้น */
         }
-        #intro h1 { font-size:48px; margin-bottom:20px; }
-        #intro ul { text-align:left; max-width:500px; font-size:20px; }
+        #intro h1 { font-size: 48px; margin-bottom: 20px; }
+        #intro ul { text-align: left; max-width: 500px; font-size: 20px; }
+
         #startBtn {
-            margin-top:30px; font-size:24px; padding:12px 30px;
-            border:none; border-radius:12px;
-            background:#A0E7E5; color:#444; cursor:pointer;
+            margin-top: 30px; font-size: 24px; padding: 12px 30px;
+            border: none; border-radius: 12px;
+            background: #A0E7E5; color: #444; cursor: pointer;
         }
-        #startBtn:hover{ background:#7ED6D4; }
+        #startBtn:hover { background: #7ED6D4; }
 
         /* ป้ายคำตอบ */
         .tiles { 
@@ -69,13 +74,13 @@
             margin-top: 20px; 
             font-size: 20px; 
             padding: 10px 20px; 
-            border-radius:10px;
-            border:none;
-            background:#A0E7E5; 
-            color:#444;
-            cursor:pointer;
+            border-radius: 10px;
+            border: none;
+            background: #A0E7E5; 
+            color: #444;
+            cursor: pointer;
         }
-        .show-btn:hover { background:#7ED6D4; }
+        .show-btn:hover { background: #7ED6D4; }
 
         /* บอร์ดคะแนน */
         .board { 
@@ -83,20 +88,22 @@
             display: flex; 
             justify-content: center; 
             gap: 15px; 
-            flex-wrap:wrap;
+            flex-wrap: wrap;
+            overflow-x: auto; /* เพิ่มการเลื่อนแนวนอน */
+            max-width: 100%; /* ป้องกันการล้นจากขอบ */
         }
         .team { 
             width: 200px; height: 150px; 
             border-radius: 20px;
-            display:flex; flex-direction:column; align-items:center; justify-content:center;
-            color:#333; font-size:20px; font-weight:bold;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #333; font-size: 20px; font-weight: bold;
             text-shadow: 1px 1px 2px #fff;
-            box-shadow:0 5px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
         }
         .score { font-size: 36px; margin: 5px 0; }
         .team button { 
-            font-size: 16px; margin:2px;
-            padding:3px 10px; border:none; border-radius:5px; cursor:pointer;
+            font-size: 16px; margin: 2px;
+            padding: 3px 10px; border: none; border-radius: 5px; cursor: pointer;
         }
 
         /* ปุ่มควบคุม ติดด้านล่าง */
@@ -112,14 +119,14 @@
         .controls button {
             font-size: 18px;
             padding: 8px 16px;
-            border:none; border-radius:8px;
-            background:#ffb84c; color:white;
-            cursor:pointer;
+            border: none; border-radius: 8px;
+            background: #ffb84c; color: white;
+            cursor: pointer;
         }
-        .controls button:hover { background:#ff9900; }
+        .controls button:hover { background: #ff9900; }
 
         /* ซ่อนเกมตอนเริ่ม */
-        #game { display:none; }
+        #game { display: none; }
     </style>
 </head>
 <body>
@@ -133,7 +140,10 @@
         <li>กดปุ่ม <b>แสดงเฉลยทั้งหมด</b> เมื่อครูต้องการเฉลย</li>
         <li>คะแนนต่อข้อ: <b>100 คะแนน</b></li>
     </ul>
-    <button id="startBtn" onclick="startGame()">เริ่มเกม</button>
+    <!-- ลิงก์ที่เป็นปุ่มไปยังเกม1 -->
+    <a href="game1.html">
+        <button id="startBtn">เริ่มเกม</button>
+    </a>
 </div>
 
 <!-- เกมหลัก -->
