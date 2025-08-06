@@ -3,142 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>โปรแกรมคำนวณยอดฝาก-ถอน พร้อมดาวน์โหลด Excel</title>
+    <title>โปรแกรมบัญชีส่วนตัว</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
             padding: 20px;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
         .container {
-            width: 300px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        h1 {
+            font-size: 26px;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
         }
         label {
-            font-size: 16px;
-            margin-bottom: 10px;
-            display: block;
-        }
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .result {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 18px;
-        }
-        .timestamp {
-            text-align: center;
             font-size: 14px;
-            color: #555;
+            color: #7f8c8d;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input[type="text"], input[type="password"], input[type="number"], input[type="date"], input[type="time"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 25px;
+        }
+        .button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .button:active {
+            transform: translateY(2px);
+        }
+        #setup-btn, #back-btn {
+            background-color: #007bff;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+        }
+        #setup-btn:hover, #back-btn:hover {
+            background-color: #0069d9;
+        }
+        #calculate-btn {
+            background-color: #28a745;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+        }
+        #calculate-btn:hover {
+            background-color: #218838;
+        }
+        #download-btn {
+            background-color: #007bff;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+        }
+        #download-btn:hover {
+            background-color: #0069d9;
+        }
+        #clear-btn {
+            background-color: #dc3545;
+            color: white;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
+        }
+        #clear-btn:hover {
+            background-color: #c82333;
+        }
+        .result-box {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        .result-text {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .profit { color: #28a745; }
+        .loss { color: #dc3545; }
+        .neutral { color: #6c757d; }
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        @media (min-width: 600px) {
+            .button-group {
+                flex-direction: row;
+            }
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <h1>โปรแกรมคำนวณยอดฝาก-ถอน</h1>
+    <div id="setup-page" class="container">
+        <h1>ตั้งค่าเริ่มต้น</h1>
+        <div class="input-group">
+            <label for="date-input">วันที่:</label>
+            <input type="date" id="date-input"/>
+        </div>
+        <div class="input-group">
+            <label for="initial-deposit">ยอดเงินฝาก (ทุนวันนี้):</label>
+            <input type="number" id="initial-deposit" placeholder="กรอกยอดเงินทุน"/>
+        </div>
+        <button class="button" id="setup-btn" onclick="saveInitialData()">เริ่มใช้งาน</button>
+    </div>
 
-    <div class="container">
-        <label for="deposit">ยอดฝาก (บาท):</label>
-        <input type="number" id="deposit" placeholder="กรอกยอดฝาก" oninput="updateTimestamp()"/>
-
-        <label for="withdraw">ยอดถอน (บาท):</label>
-        <input type="number" id="withdraw" placeholder="กรอกยอดถอน" oninput="updateTimestamp()"/>
-
-        <button onclick="calculate()">คำนวณ</button>
-        <button onclick="downloadExcel()">ดาวน์โหลด Excel</button>
-
-        <div class="result" id="result"></div>
-        <div class="timestamp" id="timestamp"></div>
+    <div id="main-app" class="container hidden">
+        <h1>โปรแกรมบัญชีส่วนตัว</h1>
+        <div class="input-group">
+            <label for="deposit">ยอดเงินฝาก (ทุน):</label>
+            <input type="number" id="deposit" disabled/>
+        </div>
+        <div class="input-group">
+            <label for="current">ยอดเงินปัจจุบัน:</label>
+            <input type="number" id="current" placeholder="กรอกยอดเงินคงเหลือ" oninput="updateTimestamp()"/>
+        </div>
+        <div class="button-group">
+            <button class="button" id="calculate-btn" onclick="calculate()">คำนวณและบันทึก</button>
+            <button class="button" id="download-btn" onclick="downloadExcel()">ดาวน์โหลด Excel</button>
+            <button class="button" id="clear-btn" onclick="clearData()">ล้างข้อมูล</button>
+            <button class="button" id="back-btn" onclick="backToSetup()">ย้อนกลับ</button>
+        </div>
+        <div class="result-box">
+            <div class="result-text neutral" id="result">กรอกข้อมูลเพื่อคำนวณ</div>
+            <div class="timestamp" id="timestamp"></div>
+        </div>
     </div>
 
     <script>
         let transactionData = [];
 
+        // ตรวจสอบสถานะเมื่อโหลดหน้าเว็บ
+        window.onload = function() {
+            const initialData = localStorage.getItem('initialData');
+            if (initialData) {
+                showMainApp();
+                loadInitialData();
+                loadTransactionData();
+            } else {
+                showSetupPage();
+            }
+        };
+
+        function saveInitialData() {
+            const date = document.getElementById('date-input').value;
+            const deposit = document.getElementById('initial-deposit').value;
+            if (date && deposit) {
+                localStorage.setItem('initialData', JSON.stringify({ date, deposit }));
+                showMainApp();
+                loadInitialData();
+            } else {
+                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+            }
+        }
+
+        function loadInitialData() {
+            const initialData = JSON.parse(localStorage.getItem('initialData'));
+            if (initialData) {
+                document.getElementById('deposit').value = initialData.deposit;
+            }
+        }
+
+        function backToSetup() {
+            if (confirm("การย้อนกลับจะล้างข้อมูลทั้งหมดในโปรแกรมนี้ คุณแน่ใจหรือไม่?")) {
+                localStorage.removeItem('initialData');
+                localStorage.removeItem('transactionData');
+                transactionData = [];
+                showSetupPage();
+            }
+        }
+
+        function showSetupPage() {
+            document.getElementById('setup-page').classList.remove('hidden');
+            document.getElementById('main-app').classList.add('hidden');
+        }
+
+        function showMainApp() {
+            document.getElementById('setup-page').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+        }
+
+        function loadTransactionData() {
+            const storedData = localStorage.getItem('transactionData');
+            if (storedData) {
+                transactionData = JSON.parse(storedData);
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('transactionData', JSON.stringify(transactionData));
+        }
+
+        function clearData() {
+            if (confirm("คุณต้องการล้างข้อมูลการทำรายการทั้งหมดใช่หรือไม่?")) {
+                localStorage.removeItem('transactionData');
+                transactionData = [];
+                alert("ล้างข้อมูลการทำรายการทั้งหมดเรียบร้อยแล้ว");
+                document.getElementById("current").value = "";
+                document.getElementById("result").innerHTML = "กรอกข้อมูลเพื่อคำนวณ";
+                document.getElementById("result").className = "result-text neutral";
+                document.getElementById("timestamp").innerHTML = "";
+            }
+        }
+
         function calculate() {
             var deposit = parseFloat(document.getElementById("deposit").value) || 0;
-            var withdraw = parseFloat(document.getElementById("withdraw").value) || 0;
+            var current = parseFloat(document.getElementById("current").value) || 0;
+            var netResult = current - deposit;
 
-            var netResult = withdraw - deposit;
-
-            var resultText = "ผลสุทธิ: ";
+            var resultElement = document.getElementById("result");
+            var resultText = "";
 
             if (netResult > 0) {
-                resultText += "กำไร " + netResult + " บาท";
+                resultText = "กำไร " + netResult.toFixed(2) + " บาท";
+                resultElement.className = "result-text profit";
             } else if (netResult < 0) {
-                resultText += "ขาดทุน " + Math.abs(netResult) + " บาท";
+                resultText = "ขาดทุน " + Math.abs(netResult).toFixed(2) + " บาท";
+                resultElement.className = "result-text loss";
             } else {
-                resultText += "ไม่มีการเปลี่ยนแปลง";
+                resultText = "ไม่มีการเปลี่ยนแปลง";
+                resultElement.className = "result-text neutral";
             }
-
-            document.getElementById("result").innerHTML = resultText;
-
-            // บันทึกข้อมูลการฝากและถอน
+            resultElement.innerHTML = resultText;
+            
+            const initialDate = JSON.parse(localStorage.getItem('initialData')).date;
             const currentDate = new Date();
-            const formattedDate = currentDate.toLocaleString('th-TH', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
+            const formattedTime = currentDate.toLocaleString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
             transactionData.push({
-                "วันที่": formattedDate,
-                "ฝาก": deposit,
-                "ถอน": withdraw,
-                "ผลลัพธ์": netResult
+                "วันที่เริ่ม": initialDate,
+                "เวลาที่คำนวณ": formattedTime,
+                "ฝาก (บาท)": deposit,
+                "ยอดปัจจุบัน (บาท)": current,
+                "ผลลัพธ์ (บาท)": netResult
             });
+            saveData();
         }
 
         function updateTimestamp() {
             var currentDate = new Date();
             var formattedDate = currentDate.toLocaleString('th-TH', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
             });
-            document.getElementById("timestamp").innerHTML = "เวลาปัจจุบัน: " + formattedDate;
+            document.getElementById("timestamp").innerHTML = "เวลาล่าสุด: " + formattedDate;
         }
 
         function downloadExcel() {
+            if (transactionData.length === 0) {
+                alert("ไม่มีข้อมูลให้ดาวน์โหลด");
+                return;
+            }
             const ws = XLSX.utils.json_to_sheet(transactionData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "ธุรกรรม");
-
-            // ดาวน์โหลดไฟล์ Excel
-            XLSX.writeFile(wb, "การคำนวณยอดฝาก-ถอน.xlsx");
+            XLSX.writeFile(wb, "รายการคำนวณ.xlsx");
         }
     </script>
-
 </body>
 </html>
