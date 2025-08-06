@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โปรแกรมคำนวณยอดฝาก-ถอน พร้อมดาวน์โหลด Excel</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        label {
+            font-size: 16px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .timestamp {
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>โปรแกรมคำนวณยอดฝาก-ถอน</h1>
+
+    <div class="container">
+        <label for="deposit">ยอดฝาก (บาท):</label>
+        <input type="number" id="deposit" placeholder="กรอกยอดฝาก" oninput="updateTimestamp()"/>
+
+        <label for="withdraw">ยอดถอน (บาท):</label>
+        <input type="number" id="withdraw" placeholder="กรอกยอดถอน" oninput="updateTimestamp()"/>
+
+        <button onclick="calculate()">คำนวณ</button>
+        <button onclick="downloadExcel()">ดาวน์โหลด Excel</button>
+
+        <div class="result" id="result"></div>
+        <div class="timestamp" id="timestamp"></div>
+    </div>
+
+    <script>
+        let transactionData = [];
+
+        function calculate() {
+            var deposit = parseFloat(document.getElementById("deposit").value) || 0;
+            var withdraw = parseFloat(document.getElementById("withdraw").value) || 0;
+
+            var netResult = withdraw - deposit;
+
+            var resultText = "ผลสุทธิ: ";
+
+            if (netResult > 0) {
+                resultText += "กำไร " + netResult + " บาท";
+            } else if (netResult < 0) {
+                resultText += "ขาดทุน " + Math.abs(netResult) + " บาท";
+            } else {
+                resultText += "ไม่มีการเปลี่ยนแปลง";
+            }
+
+            document.getElementById("result").innerHTML = resultText;
+
+            // บันทึกข้อมูลการฝากและถอน
+            const currentDate = new Date();
+            const formattedDate = currentDate.toLocaleString('th-TH', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            transactionData.push({
+                "วันที่": formattedDate,
+                "ฝาก": deposit,
+                "ถอน": withdraw,
+                "ผลลัพธ์": netResult
+            });
+        }
+
+        function updateTimestamp() {
+            var currentDate = new Date();
+            var formattedDate = currentDate.toLocaleString('th-TH', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById("timestamp").innerHTML = "เวลาปัจจุบัน: " + formattedDate;
+        }
+
+        function downloadExcel() {
+            const ws = XLSX.utils.json_to_sheet(transactionData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "ธุรกรรม");
+
+            // ดาวน์โหลดไฟล์ Excel
+            XLSX.writeFile(wb, "การคำนวณยอดฝาก-ถอน.xlsx");
+        }
+    </script>
+
+</body>
+</html>
