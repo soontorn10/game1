@@ -76,28 +76,21 @@
         .button:active {
             transform: translateY(2px);
         }
-        #setup-btn, #back-btn {
+        #setup-btn, #download-btn, #back-btn {
             background-color: #007bff;
             color: white;
             box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
         }
-        #setup-btn:hover, #back-btn:hover {
+        #setup-btn:hover, #download-btn:hover, #back-btn:hover {
             background-color: #0069d9;
         }
         #calculate-btn {
             background-color: #28a745;
-            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+            color: white;
+            box-shadow: 0 4gpx 10px rgba(40, 167, 69, 0.2);
         }
         #calculate-btn:hover {
             background-color: #218838;
-        }
-        #download-btn {
-            background-color: #007bff;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
-        }
-        #download-btn:hover {
-            background-color: #0069d9;
         }
         #clear-btn {
             background-color: #dc3545;
@@ -177,7 +170,6 @@
     <script>
         let transactionData = [];
 
-        // ตรวจสอบสถานะเมื่อโหลดหน้าเว็บ
         window.onload = function() {
             const initialData = localStorage.getItem('initialData');
             if (initialData) {
@@ -270,7 +262,8 @@
             }
             resultElement.innerHTML = resultText;
             
-            const initialDate = JSON.parse(localStorage.getItem('initialData')).date;
+            const initialData = JSON.parse(localStorage.getItem('initialData'));
+            const initialDate = initialData ? initialData.date : "";
             const currentDate = new Date();
             const formattedTime = currentDate.toLocaleString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
